@@ -30,17 +30,17 @@ class UserController:
         return jsonify({"msg": "Login realizado com sucesso"}), 200
 
     @staticmethod
-    def delete_user():
+    def delete_account():
         # Lógica Aqui
         return jsonify({"msg": "Sua conta foi deletada"}), 200
 
     @staticmethod
-    def edit_user():
+    def edit_account():
         # Lógica Aqui
         return jsonify({"msg": "Seus dados foram atualizados"}), 200
 
     @staticmethod
-    def details():
+    def details_account():
         # Lógica Aqui
         return jsonify({"msg": "Detalhes do seu perfil"}), 200
 
@@ -48,6 +48,6 @@ class UserController:
 
 users_bp.add_url_rule('/register', view_func=UserController.register, methods=['POST'])
 users_bp.add_url_rule('/login', view_func=UserController.login, methods=['POST'])
-users_bp.add_url_rule('/delete', view_func=UserController.delete_user, methods=['DELETE'])
-users_bp.add_url_rule('/edit', view_func=UserController.edit_user, methods=['PUT'])
-users_bp.add_url_rule('/details', view_func=UserController.details, methods=['GET'])
+users_bp.add_url_rule('/delete', view_func=UserController.delete_account, methods=['DELETE'])
+users_bp.add_url_rule('/edit', view_func=UserController.edit_account, methods=['PUT'])
+users_bp.add_url_rule('/details', view_func=UserController.details_account, methods=['GET'])
