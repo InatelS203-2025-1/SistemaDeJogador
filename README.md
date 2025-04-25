@@ -11,6 +11,8 @@ O código desenvolvido neste projeto contempla atividades de registro de jogador
 ## Tecnologias Utilizadas
 
 - python
+- SQL Alchemy
+- Flask
 - Neon Database
 - JWT (JSON Web Token)
 
@@ -20,11 +22,8 @@ O código desenvolvido neste projeto contempla atividades de registro de jogador
     ```bash
     git clone https://github.com/S203-L3/GPTNotFound.git
     ```
-2. Navegue até o diretório do projeto:
-    ```bash
-    cd GPTNOTFOUND
-    ```
-3. Instale as dependências:
+
+2. Instale as dependências:
     ```bash
     pip install -r requirements.txt
     ```
@@ -33,7 +32,7 @@ O código desenvolvido neste projeto contempla atividades de registro de jogador
 
 1. Inicie o servidor:
     ```
-    python ~~
+    flask run
     ```
 2. Acesse `http://localhost:3000` no seu navegador.
 
