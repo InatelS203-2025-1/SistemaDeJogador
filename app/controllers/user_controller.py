@@ -10,7 +10,6 @@ users_bp = Blueprint('users_bp', __name__)
 class UserController:
 
     @staticmethod
-    @staticmethod
     def register():
         data = request.get_json()
 
