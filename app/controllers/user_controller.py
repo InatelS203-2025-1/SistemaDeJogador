@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
 from app.models.user import User
 from app import db
-
+import jwt
+import datetime
+from flask import current_app
 users_bp = Blueprint('users_bp', __name__)
 
 
@@ -16,18 +18,51 @@ class UserController:
         password = data.get("password")
         dateofbirth = data.get("dateofbirth")
 
-        # Fazer tratamentos
+        if not name or not email or not password or not dateofbirth:
+            return jsonify({"msg": "Todos os campos são obrigatórios"}), 400
 
-        new_user = User(name=name, email=email, password=password, dateofbirth=dateofbirth)
+        if User.query.filter_by(email=email).first():
+            return jsonify({"msg": "Email já registrado"}), 409
+
+        new_user = User(name=name, email=email, dateofbirth=dateofbirth)
+        new_user.set_password(password)
+
         db.session.add(new_user)
         db.session.commit()
 
         return jsonify({"msg": "Usuário registrado com sucesso", "user_id": new_user.id}), 201
 
+
     @staticmethod
     def login():
-        # Lógica Aqui
-        return jsonify({"msg": "Login realizado com sucesso"}), 200
+        data = request.get_json()
+        email = data.get("email")
+        password = data.get("password")
+
+        if not email or not password:
+            return jsonify({"msg": "Email e senha são obrigatórios"}), 400
+
+        user = User.query.filter_by(email=email).first()
+
+        if not user or not user.check_password(password):
+            return jsonify({"msg": "Credenciais inválidas"}), 401
+
+        token = jwt.encode(
+            {
+                "user_id": user.id,
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+            },
+            current_app.config['SECRET_KEY'],
+            algorithm="HS256"
+        )
+
+        return jsonify({
+            "msg": "Login realizado com sucesso",
+            "token": token,
+            "user_id": user.id
+        }), 200
+
+
 
     @staticmethod
     def delete_account():
