@@ -1,9 +1,6 @@
 from flask import Flask
 from config import Config
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-
+from app.extensions import db  # ✅ use a instância compartilhada
 
 def create_app():
     app = Flask(__name__)
