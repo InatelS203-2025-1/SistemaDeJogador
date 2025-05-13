@@ -5,7 +5,7 @@ O código desenvolvido neste projeto contempla atividades de registro de jogador
 
 ## Padrão Arquitetural 
 
-O sistema foi desenvolvido em cima do padrão arquitetural *SOA (Service Oriented Architecture)*. Por se tratar de um sistema que se baseia na autenticação de jogadores, as funcionalidades implementadas são feitas para atender outros serviços que vão precisar autenticar e gerenciar jogadores, e esses são registrados e consultados a partir de um banco de dados (model). Ou seja, o principal uso da aplicação se dá por meio de outras aplicações através dos endpoints fornecidos (controller), tornando-se adequado o uso do padrão SOA.
+O sistema foi desenvolvido em cima do padrão arquitetural **SOA (Service Oriented Architecture)**. Por se tratar de um sistema que se baseia na autenticação de jogadores, as funcionalidades implementadas são feitas para atender outros serviços que vão precisar autenticar e gerenciar jogadores, e esses são registrados e consultados a partir de um banco de dados *(model)*. Ou seja, o principal uso da aplicação se dá por meio de outras aplicações através dos endpoints fornecidos *(controller)*, tornando-se adequado o uso do padrão SOA.
 
 ## Funcionalidades
 
