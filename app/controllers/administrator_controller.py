@@ -6,18 +6,22 @@ admin_bp = Blueprint('admin_bp', __name__)
 
 class AdministratorController(UserController):
 
+    @staticmethod
     def create_user():
         # Lógica Aqui
         return jsonify({"msg": "Player created!"}), 200
 
+    @staticmethod
     def get_all_users():
         # Lógica Aqui
         return jsonify({"msg": "All players"}), 200
 
+    @staticmethod
     def edit_user(user_id):
         # Lógica Aqui
         return jsonify({"msg": f"Player {user_id} updated!"}), 200
 
+    @staticmethod
     def delete_user(user_id):
         # Lógica Aqui
         return jsonify({"msg": f"Player {user_id} deleted!"}), 200

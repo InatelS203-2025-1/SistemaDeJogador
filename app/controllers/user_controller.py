@@ -1,10 +1,6 @@
 from flask import Blueprint, request, jsonify
-from app.models.user import User
-from app import db
-import jwt
-import datetime
-from flask import current_app
-from app.Services.rabbitmq.publisher import publish_player_created
+from app.services.token_service import generate_token
+from app.services.user_service import login_validation, registration_validation, create_user
 
 users_bp = Blueprint('users_bp', __name__)
 
@@ -20,27 +16,16 @@ class UserController:
         password = data.get("password")
         dateofbirth = data.get("dateofbirth")
 
-        if not name or not email or not password or not dateofbirth:
-            return jsonify({"msg": "Todos os campos são obrigatórios"}), 400
+        error_msg, status_code = registration_validation(name, email, password, dateofbirth)
+        if error_msg:
+            return jsonify(error_msg), status_code
 
-        if User.query.filter_by(email=email).first():
-            return jsonify({"msg": "Email já registrado"}), 409
+        user = create_user(name, email, password, dateofbirth)
 
-        new_user = User(name=name, email=email, dateofbirth=dateofbirth)
-        new_user.set_password(password)
-
-        db.session.add(new_user)
-        db.session.commit()
-        publish_player_created({
-            "id": new_user.id,
-            "name": new_user.name,
-            "email": new_user.email,
-            "dateofbirth": str(new_user.dateofbirth)
-        })
-
-
-        return jsonify({"msg": "Usuário registrado com sucesso", "user_id": new_user.id}), 201
-
+        return jsonify({
+            "msg": "Usuário registrado com sucesso",
+            "user_id": user.id
+        }), 201
 
     @staticmethod
     def login():
@@ -48,22 +33,11 @@ class UserController:
         email = data.get("email")
         password = data.get("password")
 
-        if not email or not password:
-            return jsonify({"msg": "Email e senha são obrigatórios"}), 400
+        user, error_msg, status_code = login_validation(email, password)
+        if error_msg:
+            return jsonify(error_msg), status_code
 
-        user = User.query.filter_by(email=email).first()
-
-        if not user or not user.check_password(password):
-            return jsonify({"msg": "Credenciais inválidas"}), 401
-
-        token = jwt.encode(
-            {
-                "user_id": user.id,
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)
-            },
-            current_app.config['SECRET_KEY'],
-            algorithm="HS256"
-        )
+        token = generate_token(user.id)
 
         return jsonify({
             "msg": "Login realizado com sucesso",

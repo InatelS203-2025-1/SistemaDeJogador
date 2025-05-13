@@ -1,8 +1,11 @@
+import os
+
 import pika
 import json
 
-RABBITMQ_URL = 'amqp://guest:guest@localhost:5672/'
-QUEUE_NAME = 'player.created'
+RABBITMQ_URL = os.getenv('RABBITMQ_URL')
+QUEUE_NAME = os.getenv('QUEUE_NAME')
+
 
 def publish_player_created(player_data):
     connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))

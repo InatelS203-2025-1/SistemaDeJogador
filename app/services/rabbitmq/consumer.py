@@ -1,8 +1,11 @@
+import os
+
 import pika
 import json
 
-RABBITMQ_URL = 'amqp://guest:guest@localhost:5672/'
-QUEUE_NAME = 'player.created'
+RABBITMQ_URL = os.getenv('RABBITMQ_URL')
+QUEUE_NAME = os.getenv('QUEUE_NAME')
+
 
 def callback(ch, method, properties, body):
     player_data = json.loads(body)
