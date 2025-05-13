@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config
-from app.extensions import db  # ✅ use a instância compartilhada
+from app.extensions import db
 
 def create_app():
     app = Flask(__name__)
