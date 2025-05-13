@@ -1,6 +1,9 @@
-from flask import Blueprint, request, jsonify
-from app.services.token_service import generate_token
+from flask import Blueprint, request, jsonify, current_app
+from app.services.token_service import generate_token, token_validation
 from app.services.user_service import login_validation, registration_validation, create_user
+import jwt
+from app.models.user import User
+
 
 users_bp = Blueprint('users_bp', __name__)
 
@@ -59,8 +62,29 @@ class UserController:
 
     @staticmethod
     def details_account():
-        # Lógica Aqui
-        return jsonify({"msg": "Detalhes do seu perfil"}), 200
+        auth_header = request.headers.get("Authorization")
+
+        if not auth_header:
+            return jsonify({"msg": "Token de autenticação não fornecido"}), 401
+
+        user_id, error_msg, status_code = token_validation(auth_header, current_app.config['SECRET_KEY'], current_app.config['JWT_ALGORITHM'])
+
+        if error_msg:
+            return jsonify(error_msg), status_code
+        
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({"msg": "Usuário não encontrado"}), 404
+
+        user_data = {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "dateofbirth": str(user.dateofbirth)
+        }
+
+        return jsonify({"msg": "Detalhes do seu perfil", "user": user_data}), 200
 
 
 
