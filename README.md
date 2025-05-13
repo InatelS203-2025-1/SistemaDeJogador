@@ -15,6 +15,8 @@ O código desenvolvido neste projeto contempla atividades de registro de jogador
 - Flask
 - Neon Database
 - JWT (JSON Web Token)
+- RabbitMQ
+
 
 ## Instalação
 
@@ -35,6 +37,13 @@ O código desenvolvido neste projeto contempla atividades de registro de jogador
     flask run
     ```
 2. Acesse `http://localhost:3000` no seu navegador.
+
+## instale a imagem do RabbitMQ 
+1. rode utilizando o comando abaixo
+    ```
+    docker run -d --hostname rabbitmq-host --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+    ```
+
 
 
 ## Endpoints

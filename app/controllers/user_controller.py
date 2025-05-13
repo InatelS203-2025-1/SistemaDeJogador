@@ -4,6 +4,8 @@ from app import db
 import jwt
 import datetime
 from flask import current_app
+from app.Services.rabbitmq.publisher import publish_player_created
+
 users_bp = Blueprint('users_bp', __name__)
 
 
@@ -29,6 +31,13 @@ class UserController:
 
         db.session.add(new_user)
         db.session.commit()
+        publish_player_created({
+            "id": new_user.id,
+            "name": new_user.name,
+            "email": new_user.email,
+            "dateofbirth": str(new_user.dateofbirth)
+        })
+
 
         return jsonify({"msg": "Usuário registrado com sucesso", "user_id": new_user.id}), 201
 
