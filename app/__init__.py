@@ -15,6 +15,6 @@ def create_app():
     from .controllers.user_controller import users_bp
 
     app.register_blueprint(users_bp, url_prefix='/api/user')
-    app.register_blueprint(admin_bp, url_prefix='/api/admin')
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')#
 
     return app
