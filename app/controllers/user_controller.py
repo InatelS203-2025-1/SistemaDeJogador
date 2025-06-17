@@ -14,17 +14,17 @@ class UserController:
     def register():
         data = request.get_json()
 
-        '''
+        
         if "is_adm" in data:
             return jsonify({"msg": "Você não tem permissão para definir o campo 'is_adm'."}), 403
-        '''
+        
         name = data.get("name")
         email = data.get("email")
         password = data.get("password")
         dateofbirth = data.get("dateofbirth")
 
         #   Força o is_adm a ser sempre False, ignorando qualquer tentativa de passar esse campo
-        is_adm = data.get("is_adm")
+        is_adm = False
         
         error_msg, status_code = registration_validation(name, email, password, dateofbirth, is_adm)
         if error_msg:

@@ -4,7 +4,7 @@ from app.services.rabbitmq.publisher import publish_player_created
 
 
 def registration_validation(name, email, password, dateofbirth, is_adm):
-    if not name or not email or not password or not dateofbirth or not is_adm:
+    if not name or not email or not password or not dateofbirth or is_adm is None:
         return {"msg": "Todos os campos são obrigatórios"}, 400
 
 
