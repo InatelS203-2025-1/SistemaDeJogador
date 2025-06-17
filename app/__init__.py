@@ -18,3 +18,5 @@ def create_app():
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
 
     return app
+
+

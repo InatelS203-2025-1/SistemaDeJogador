@@ -1,31 +1,43 @@
-from flask import Blueprint, request, jsonify
-from app.services.token_service import generate_token
+from flask import Blueprint, request, jsonify, current_app
+from app.services.token_service import generate_token, token_validation
 from app.services.user_service import login_validation, registration_validation, create_user
+from app.models.user import User
+from app.extensions import db
 
 users_bp = Blueprint('users_bp', __name__)
 
 
 class UserController:
 
+
     @staticmethod
     def register():
         data = request.get_json()
 
+        '''
+        if "is_adm" in data:
+            return jsonify({"msg": "Você não tem permissão para definir o campo 'is_adm'."}), 403
+        '''
         name = data.get("name")
         email = data.get("email")
         password = data.get("password")
         dateofbirth = data.get("dateofbirth")
 
-        error_msg, status_code = registration_validation(name, email, password, dateofbirth)
+        #   Força o is_adm a ser sempre False, ignorando qualquer tentativa de passar esse campo
+        is_adm = data.get("is_adm")
+        
+        error_msg, status_code = registration_validation(name, email, password, dateofbirth, is_adm)
         if error_msg:
             return jsonify(error_msg), status_code
 
-        user = create_user(name, email, password, dateofbirth)
+        user = create_user(name, email, password, dateofbirth, is_adm)
 
         return jsonify({
             "msg": "Usuário registrado com sucesso",
             "user_id": user.id
         }), 201
+
+    
 
     @staticmethod
     def login():
@@ -37,7 +49,7 @@ class UserController:
         if error_msg:
             return jsonify(error_msg), status_code
 
-        token = generate_token(user.id)
+        token = generate_token(user.id, user.is_adm)
 
         return jsonify({
             "msg": "Login realizado com sucesso",
@@ -45,25 +57,102 @@ class UserController:
             "user_id": user.id
         }), 200
 
-
-
     @staticmethod
     def delete_account():
-        # Lógica Aqui
+        auth_header = request.headers.get("Authorization")
+
+        if not auth_header:
+            return jsonify({"msg": "Token de autenticação não fornecido"}), 401
+
+        user_id, is_adm, error_msg, status_code = token_validation(
+            auth_header,
+            current_app.config['SECRET_KEY'],
+            current_app.config['JWT_ALGORITHM']
+        )
+
+        if error_msg:
+            return jsonify(error_msg), status_code
+
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"msg": "Usuário não encontrado"}), 404
+
+        db.session.delete(user)
+        db.session.commit()
+
         return jsonify({"msg": "Sua conta foi deletada"}), 200
 
     @staticmethod
     def edit_account():
-        # Lógica Aqui
-        return jsonify({"msg": "Seus dados foram atualizados"}), 200
+        auth_header = request.headers.get("Authorization")
+
+        if not auth_header:
+            return jsonify({"msg": "Token de autenticação não fornecido"}), 401
+
+        user_id, is_adm, error_msg, status_code = token_validation(
+            auth_header,
+            current_app.config['SECRET_KEY'],
+            current_app.config['JWT_ALGORITHM']
+        )
+
+        if error_msg:
+            return jsonify(error_msg), status_code
+
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"msg": "Usuário não encontrado"}), 404
+
+        data = request.get_json()
+        user.name = data.get("name", user.name)
+        user.email = data.get("email", user.email)
+        user.dateofbirth = data.get("dateofbirth", user.dateofbirth)
+
+        db.session.commit()
+
+        return jsonify({
+            "msg": "Seus dados foram atualizados",
+            "user": {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "dateofbirth": str(user.dateofbirth),
+                "is_adm": user.is_adm
+            }
+        }), 200
 
     @staticmethod
     def details_account():
-        # Lógica Aqui
-        return jsonify({"msg": "Detalhes do seu perfil"}), 200
+        auth_header = request.headers.get("Authorization")
+
+        if not auth_header:
+            return jsonify({"msg": "Token de autenticação não fornecido"}), 401
+
+        user_id, is_adm, error_msg, status_code = token_validation(
+            auth_header,
+            current_app.config['SECRET_KEY'],
+            current_app.config['JWT_ALGORITHM']
+        )
+
+        if error_msg:
+            return jsonify(error_msg), status_code
+
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({"msg": "Usuário não encontrado"}), 404
+
+        user_data = {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "dateofbirth": str(user.dateofbirth),
+            "is_adm": user.is_adm
+        }
+
+        return jsonify({"msg": "Detalhes do seu perfil", "user": user_data}), 200
 
 
-
+# Rotas
 users_bp.add_url_rule('/register', view_func=UserController.register, methods=['POST'])
 users_bp.add_url_rule('/login', view_func=UserController.login, methods=['POST'])
 users_bp.add_url_rule('/delete', view_func=UserController.delete_account, methods=['DELETE'])

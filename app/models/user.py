@@ -9,6 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     dateofbirth = db.Column(db.String(10), nullable=False)
+    is_adm = db.Column(db.Boolean, nullable=False, default=False)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

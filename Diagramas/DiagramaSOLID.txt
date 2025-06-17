@@ -1,0 +1,9 @@
+Usando o princípio I do SOLID, que remete ao princípio de segregação de interface (ISP), os métodos que interagem com o jogador em específico foram modificados para estar em uma interface enxuta, que possui poucos métodos e todos só relacionados com a edição do jogador (alterar, criar e excluir)
+ 
+Já outro princípio foi o D do solid, que é o princípio de inversão de dependência, que consiste em maximizar as abstrações e diminuir as implementações concretas. Com isso, foi alterado que a nossa classe usuário se tornasse abstrata, e a partir das classes que herdam dela (Administrador e Jogador), que as instâncias poderiam ser concretizadas
+ 
+A ideia das interfaces que interagem com o jogador já se tornam também uma facilidade para as outras aplicações quando precisarem utilizar os endpoints, cada uma implementando da maneira que convir, mas como sugestão esses métodos vão ser métodos que podem utilizar o token a partir do jogador que foi passado como parâmetro
+
+Também utilizamos o princípio da responsabilidade única através da classe usuário (essa classe faz exatamente uma coisa a qual foi atribuída a ela, que é gerenciar o usuário, e o jogador e o admin vão ter também seus princípios únicos).
+
+Princípio open closed: a classe usuário vai fornecer login, editar e excluir que serão comum a todos os usuário do sistema.  
