@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.controllers.user_controller import UserController
 from app.models.user import User
 from app.extensions import db
-from app.utils.decorators import admin_required  # ajuste o path conforme seu projeto
+from app.utils.decorators import admin_required
 
 admin_bp = Blueprint('admin_bp', __name__)
 
@@ -84,6 +84,25 @@ class AdministratorController(UserController):
 
         return jsonify({"msg": f"Usuário {user_id} deletado com sucesso"}), 200
 
+    @staticmethod
+    @admin_required
+    def promote_user(user_id):
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({"msg": f"Usuário com ID {user_id} não encontrado"}), 404
+
+        if user.is_adm:
+            return jsonify(
+                {"msg": f"O usuário '{user.name}' já é um administrador"}), 409
+
+        user.is_adm = True
+        db.session.commit()
+
+        return jsonify({
+            "msg": f"O usuário '{user.name}' (ID: {user.id}) foi promovido a administrador com sucesso!"
+        }), 200
+
 
 
 # Herdados
@@ -98,3 +117,4 @@ admin_bp.add_url_rule('/create_user', view_func=AdministratorController.create_u
 admin_bp.add_url_rule('/get_all_users', view_func=AdministratorController.get_all_users, methods=['GET'])
 admin_bp.add_url_rule('/edit_user/<int:user_id>', view_func=AdministratorController.edit_user, methods=['PUT'])
 admin_bp.add_url_rule('/delete_player/<int:user_id>', view_func=AdministratorController.delete_user, methods=['DELETE'])
+admin_bp.add_url_rule('/promote/<int:user_id>', view_func=AdministratorController.promote_user, methods=['PATCH'])
