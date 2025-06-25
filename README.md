@@ -2,9 +2,33 @@
 
 Este projeto é uma API RESTful desenvolvida com Flask, SQLAlchemy, JWT e RabbitMQ, voltada para o registro, autenticação e gestão de usuários (jogadores), incluindo permissões de administrador com capacidades especiais.
 
+## 🎨 Design Patterns
+
+Singleton:
+Garantimos uma única instância do banco de dados compartilhada por todo o projeto, centralizando o acesso e otimizando recursos.
+
+Builder:
+A construção de objetos User é feita de forma flexível e controlada, com métodos como .with_password() e .with_dateofbirth() permitindo composições diferentes conforme a necessidade.
+
+Fachada (Facade):
+A TokenService atua como uma interface simplificada para operações com tokens, encapsulando internamente toda a lógica de criptografia JWT.
+
+Decorator:
+O decorator @admin_required estende funcionalidades de forma elegante, verificando se a chamada ao endpoint é feita por um administrador, sem modificar a função original.
+
 ## 🏛️ Padrão Arquitetural 
 
 O sistema foi desenvolvido em cima do padrão arquitetural **SOA (Service Oriented Architecture)**. Por se tratar de um sistema que se baseia na autenticação de jogadores, as funcionalidades implementadas são feitas para atender outros serviços que vão precisar autenticar e gerenciar jogadores, e esses são registrados e consultados a partir de um banco de dados *(model)*. Ou seja, o principal uso da aplicação se dá por meio de outras aplicações através dos endpoints fornecidos *(controller)*, tornando-se adequado o uso do padrão SOA.
+
+## ⛓️ Princípios Solid
+
+S (Responsabilidade Única): Cada classe possui uma responsabilidade bem definida. O TokenService, por exemplo, é responsável exclusivamente pelo gerenciamento de tokens. Da mesma forma, o UserController atua apenas como orquestrador de requisições, enquanto a lógica de negócio fica no UserService.
+
+O (Aberto/Fechado): O projeto permite extensão sem modificação. Isso é evidente no uso do UserBuilder, que permite adicionar novos campos por meio de métodos como .with_...(), sem alterar o código existente.
+
+L (Substituição de Liskov): O princípio é respeitado. A classe AdministratorController herda de UserController e pode substituí-la sem comprometer o funcionamento do sistema, mantendo compatibilidade de comportamento.
+
+D (Inversão de Dependência): O projeto utiliza abstrações para separar módulos de alto e baixo nível. Um exemplo é o uso do TokenService, que funciona como uma interface para encapsular e abstrair os métodos relacionados à manipulação de tokens, permitindo que outras classes dependam dessa abstração e não de implementações concretas.
 
 ## 🚀 Funcionalidades
 
